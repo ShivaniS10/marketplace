@@ -43,9 +43,10 @@ const httpServer = http.createServer(app);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://egmarketplace.netlify.app';
 const allowedOrigins = [
   'https://egmarketplace.netlify.app',
+  'https://marketplace-gamma-roan.vercel.app', // Vercel deployment
   'http://localhost:5173',
   'http://localhost:3000',
-  FRONTEND_URL  // picks up whatever is set in .env
+  FRONTEND_URL  // picks up whatever is set in .env or Render dashboard
 ].filter((v, i, arr) => arr.indexOf(v) === i); // deduplicate
 
 app.use(cors({

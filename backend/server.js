@@ -40,11 +40,26 @@ const app = express();
 const httpServer = http.createServer(app);
 
 // Middleware
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://egmarketplace.netlify.app/';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://egmarketplace.netlify.app';
+const allowedOrigins = [
+  'https://egmarketplace.netlify.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  FRONTEND_URL  // picks up whatever is set in .env
+].filter((v, i, arr) => arr.indexOf(v) === i); // deduplicate
+
 app.use(cors({
-  origin: FRONTEND_URL,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
+// Razorpay webhook signature verification requires the raw request body.
+app.use('/api/orders/webhook/razorpay', express.raw({ type: 'application/json' }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -97,7 +112,7 @@ app.use('/api/contact', contactRoutes);
 // Socket.IO setup
 const io = socketIo(httpServer, {
   cors: {
-    origin: FRONTEND_URL,
+    origin: allowedOrigins,
     credentials: true
   }
 });

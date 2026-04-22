@@ -3,8 +3,13 @@
 // go through Vite's proxy (vite.config.js) to http://localhost:3000.
 // In production: set VITE_API_URL=https://eg-marketplace-1.onrender.com in your .env
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+let envUrl = import.meta.env.VITE_API_URL || '';
+if (envUrl.endsWith('/')) {
+  envUrl = envUrl.slice(0, -1); // Remove trailing slash if present
+}
+
+const API_BASE_URL = envUrl;
+const SOCKET_URL = envUrl || 'http://localhost:3000';
 
 export const API_ENDPOINTS = {
   AUTH: `${API_BASE_URL}/api/auth`,
